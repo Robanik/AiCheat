@@ -1,6 +1,4 @@
-// gptr.js - логика бота
 function getBotResponse(userMessage, callback) {
-    // Этапы обдумывания
     const stages = [
         "🤖 Читаю твоё сообщение...",
         "🤖 Проверяю разрешения...",
@@ -9,14 +7,12 @@ function getBotResponse(userMessage, callback) {
 
     let stageIndex = 0;
 
-    // Создаём "виртуальный" процесс обдумывания
     function nextStage() {
         if (stageIndex < stages.length) {
-            callback(stages[stageIndex], false); // false = ещё не конечный ответ
+            callback(stages[stageIndex], false); // false = не финальный
             stageIndex++;
-            setTimeout(nextStage, 1500); // 1.5 сек между стадиями
+            setTimeout(nextStage, 1500);
         } else {
-            // После стадий ищем ответ в knowledge
             let response = "🤖 Я пока не знаю ответа, но учусь!";
             for (let item of knowledge) {
                 if (userMessage.toLowerCase().includes(item.question)) {
@@ -24,7 +20,7 @@ function getBotResponse(userMessage, callback) {
                     break;
                 }
             }
-            callback(response, true); // true = конечный ответ
+            callback(response, true); // true = финальный ответ
         }
     }
 
