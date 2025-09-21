@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPTR 1.5 Flash</title>
+<title>GPTR 1.5 Flash Tiny GPT</title>
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.8.0/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/soskek/tfjs-gpt2@latest/gpt2.min.js"></script>
 <style>
 body { font-family: Arial; background:#1a1a1a; color:#f0f0f0; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
 #chat-container { width:450px; height:650px; background:#2a2a2a; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 0 20px #000; }
@@ -28,18 +30,77 @@ pre { background:#222; padding:8px; border-radius:6px; overflow-x:auto; }
     </div>
 </div>
 
-<script src="gptr.js"></script>
 <script>
 const messagesContainer = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
+let model;
 
-function sendMessage() {
+async function loadModel() {
+    messagesContainer.innerHTML += '<div class="message ai">Загрузка Tiny GPT...</div>';
+    model = await GPT2.load(); // загружаем Tiny GPT-2
+    messagesContainer.innerHTML += '<div class="message ai">GPT готов!</div>';
+}
+
+function addMessage(text, sender) {
+    const msg = document.createElement('div');
+    msg.className = 'message ' + sender;
+
+    if(text.includes('```')) {
+        let codeContent = text.replace(/```/g, '');
+        const pre = document.createElement('pre');
+        pre.textContent = codeContent;
+
+        const btn = document.createElement('button');
+        btn.textContent = 'Скопировать';
+        btn.className = 'copy-btn';
+        btn.onclick = () => { navigator.clipboard.writeText(codeContent); };
+
+        pre.appendChild(btn);
+        msg.appendChild(pre);
+    } else {
+        msg.textContent = text;
+    }
+
+    messagesContainer.appendChild(msg);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+}
+
+async function simulateThinking() {
+    const steps = [
+        "«в мыслях...»",
+        "«анализирую команду»",
+        "«смотрю на промпт»",
+        "«обдумываю»",
+        "«готовлю ответ»"
+    ];
+    const aiMsg = document.createElement('div');
+    aiMsg.className = 'message ai';
+    messagesContainer.appendChild(aiMsg);
+
+    for(const step of steps) {
+        aiMsg.textContent = step;
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        await new Promise(r => setTimeout(r, 2000)); // 2 сек на каждый шаг
+    }
+    return aiMsg;
+}
+
+async function sendMessage() {
     const text = userInput.value.trim();
     if(!text) return;
-    GPTR.addMessage(text, 'user', messagesContainer);
+    addMessage(text, 'user');
     userInput.value = '';
-    GPTR.respond(text, messagesContainer);
+
+    const aiMsg = await simulateThinking();
+
+    // Генерация текста Tiny GPT
+    let response = await model.generate(text, {length: 100, temperature:0.7});
+    aiMsg.textContent = '';
+    addMessage(response, 'ai');
 }
+
+// Загружаем модель при старте
+loadModel();
 </script>
 
 </body>
