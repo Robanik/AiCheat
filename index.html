@@ -122,21 +122,14 @@
       input.value = "";
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // Бот отвечает через gptr.js
+      // Создаем новый элемент для сообщений бота
+      const botMsg = document.createElement("div");
+      botMsg.className = "message bot-message";
+      chatMessages.appendChild(botMsg);
+
+      // Вызов логики бота
       getBotResponse(message, (botReply, done) => {
-        if (done) {
-          // Финальный ответ — новый элемент
-          const botMsg = document.createElement("div");
-          botMsg.className = "message bot-message";
-          botMsg.textContent = botReply;
-          chatMessages.appendChild(botMsg);
-        } else {
-          // Стадии "думаю..." — отдельные элементы
-          const stageMsg = document.createElement("div");
-          stageMsg.className = "message bot-message";
-          stageMsg.textContent = botReply;
-          chatMessages.appendChild(stageMsg);
-        }
+        botMsg.textContent = botReply;
         chatMessages.scrollTop = chatMessages.scrollHeight;
       });
     }
