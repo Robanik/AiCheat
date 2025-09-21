@@ -4,91 +4,17 @@
   <meta charset="UTF-8">
   <title>Локальный ИИ Чат</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
-      color: #fff;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-    }
-
-    .chat-container {
-      width: 400px;
-      height: 600px;
-      background: #222;
-      border-radius: 15px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(0,0,0,0.5);
-    }
-
-    .chat-header {
-      background: #0f3460;
-      padding: 15px;
-      text-align: center;
-      font-size: 18px;
-      font-weight: bold;
-      border-bottom: 2px solid #1a1a2e;
-    }
-
-    .chat-messages {
-      flex: 1;
-      padding: 15px;
-      overflow-y: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-
-    .message {
-      padding: 10px 15px;
-      border-radius: 12px;
-      max-width: 75%;
-      word-wrap: break-word;
-    }
-
-    .user-message {
-      background: #0f3460;
-      align-self: flex-end;
-    }
-
-    .bot-message {
-      background: #1a1a2e;
-      align-self: flex-start;
-    }
-
-    .chat-input {
-      display: flex;
-      border-top: 2px solid #1a1a2e;
-    }
-
-    .chat-input input {
-      flex: 1;
-      padding: 15px;
-      border: none;
-      outline: none;
-      background: #333;
-      color: #fff;
-      font-size: 14px;
-    }
-
-    .chat-input button {
-      background: #e94560;
-      border: none;
-      padding: 15px 20px;
-      cursor: pointer;
-      font-weight: bold;
-      color: #fff;
-      transition: 0.3s;
-    }
-
-    .chat-input button:hover {
-      background: #ff4c70;
-    }
+    body { font-family: Arial; background:#0f3460; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+    .chat-container { width:400px; height:600px; background:#222; border-radius:15px; display:flex; flex-direction:column; overflow:hidden; }
+    .chat-header { background:#16213e; padding:15px; text-align:center; font-size:18px; font-weight:bold; border-bottom:2px solid #0f3460; }
+    .chat-messages { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+    .message { padding:10px 15px; border-radius:12px; max-width:75%; word-wrap:break-word; }
+    .user-message { background:#0f3460; align-self:flex-end; }
+    .bot-message { background:#1a1a2e; align-self:flex-start; }
+    .chat-input { display:flex; border-top:2px solid #1a1a2e; }
+    .chat-input input { flex:1; padding:15px; border:none; outline:none; background:#333; color:#fff; font-size:14px; }
+    .chat-input button { background:#e94560; border:none; padding:15px 20px; cursor:pointer; font-weight:bold; color:#fff; transition:0.3s; }
+    .chat-input button:hover { background:#ff4c70; }
   </style>
 </head>
 <body>
@@ -101,7 +27,6 @@
     </div>
   </div>
 
-  <!-- Подключаем базу знаний и логику -->
   <script src="gptrd.js"></script>
   <script src="gptr.js"></script>
 
@@ -113,7 +38,6 @@
 
       const chatMessages = document.getElementById("chatMessages");
 
-      // Сообщение пользователя
       const userMsg = document.createElement("div");
       userMsg.className = "message user-message";
       userMsg.textContent = message;
@@ -122,12 +46,10 @@
       input.value = "";
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // Создаем новый элемент для сообщений бота
       const botMsg = document.createElement("div");
       botMsg.className = "message bot-message";
       chatMessages.appendChild(botMsg);
 
-      // Вызов логики бота
       getBotResponse(message, (botReply, done) => {
         botMsg.textContent = botReply;
         chatMessages.scrollTop = chatMessages.scrollHeight;
