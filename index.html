@@ -33,6 +33,7 @@ body {
     padding: 8px 12px;
     border-radius: 8px;
     max-width: 80%;
+    word-wrap: break-word;
 }
 .user {
     background-color: #d1e7ff;
@@ -101,7 +102,7 @@ userInput.addEventListener('keydown', (e) => {
 });
 
 async function getChatGPTResponse(message) {
-    addMessage('...', 'bot'); // временный индикатор
+    addMessage('...', 'bot');
     const botDiv = chatWindow.querySelector('.bot:last-child');
 
     try {
@@ -114,16 +115,18 @@ async function getChatGPTResponse(message) {
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
                 messages: [{role: "user", content: message}],
-                max_tokens: 150
+                max_tokens: 200
             })
         });
 
         const data = await response.json();
+        console.log(data); // Для отладки
         if (data.choices && data.choices[0] && data.choices[0].message) {
             botDiv.innerText = data.choices[0].message.content.trim();
+        } else if (data.error) {
+            botDiv.innerText = 'Ошибка: ' + data.error.message;
         } else {
-            botDiv.innerText = 'Ошибка: неправильный ответ API';
-            console.log(data);
+            botDiv.innerText = 'Ошибка: непредвиденный ответ API';
         }
     } catch (error) {
         botDiv.innerText = 'Ошибка: ' + error.message;
