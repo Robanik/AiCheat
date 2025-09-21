@@ -1,15 +1,30 @@
-<input type="text" id="userInput" placeholder="Напиши сообщение..." />
-<button id="sendBtn">Отправить</button>
-
-<script>
+// Вставь сюда свой OpenAI ключ
 const OPENAI_API_KEY = "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";
 
-document.getElementById("sendBtn").addEventListener("click", async () => {
+document.getElementById("sendBtn").addEventListener("click", sendMessage);
+
+async function sendMessage() {
   const input = document.getElementById("userInput");
   const message = input.value.trim();
   if (!message) return;
 
-  console.log("Отправка запроса:", message);
+  const chatMessages = document.getElementById("chatMessages");
+
+  // Сообщение пользователя
+  const userMsg = document.createElement("div");
+  userMsg.className = "message user-message";
+  userMsg.textContent = message;
+  chatMessages.appendChild(userMsg);
+
+  input.value = "";
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+
+  // Сообщение бота: стадия "думаю..."
+  const botMsg = document.createElement("div");
+  botMsg.className = "message bot-message";
+  botMsg.textContent = "🤖 Думаю...";
+  chatMessages.appendChild(botMsg);
+  chatMessages.scrollTop = chatMessages.scrollHeight;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -21,14 +36,18 @@ document.getElementById("sendBtn").addEventListener("click", async () => {
       body: JSON.stringify({
         model: "gpt-3.5-turbo",
         messages: [{role: "user", content: message}],
-        max_tokens: 150
+        max_tokens: 200
       })
     });
 
     const data = await response.json();
-    console.log("Ответ GPT:", data.choices[0].message.content);
+    const answer = data.choices[0].message.content;
+
+    botMsg.textContent = answer;
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+
   } catch (err) {
+    botMsg.textContent = "❌ Ошибка при подключении к ChatGPT";
     console.error(err);
   }
-});
-</script>
+}
