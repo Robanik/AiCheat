@@ -2,12 +2,12 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Локальный ИИ Чат</title>
+  <title>ChatGPT на GitHub Pages</title>
   <style>
-    body { font-family: Arial; background:#0f3460; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+    body { font-family: Arial, sans-serif; background:#0f3460; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
     .chat-container { width:400px; height:600px; background:#222; border-radius:15px; display:flex; flex-direction:column; overflow:hidden; }
-    .chat-header { background:#16213e; padding:15px; text-align:center; font-size:18px; font-weight:bold; border-bottom:2px solid #0f3460; }
-    .chat-messages { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+    .chat-header { background:#16213e; padding:15px; text-align:center; font-size:18px; font-weight:bold; border-bottom:2px solid #0f3460; color: #fff; }
+    .chat-messages { flex:1; padding:15px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; color: #fff; }
     .message { padding:10px 15px; border-radius:12px; max-width:75%; word-wrap:break-word; }
     .user-message { background:#0f3460; align-self:flex-end; }
     .bot-message { background:#1a1a2e; align-self:flex-start; }
@@ -19,42 +19,14 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">🤖 Локальный ИИ</div>
+    <div class="chat-header">🤖 ChatGPT</div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input">
-      <input type="text" id="userInput" placeholder="Напиши сообщение...">
+      <input type="text" id="userInput" placeholder="Напиши сообщение..." />
       <button onclick="sendMessage()">Отправить</button>
     </div>
   </div>
 
-  <script src="gptrd.js"></script>
   <script src="gptr.js"></script>
-
-  <script>
-    function sendMessage() {
-      const input = document.getElementById("userInput");
-      const message = input.value.trim();
-      if (!message) return;
-
-      const chatMessages = document.getElementById("chatMessages");
-
-      const userMsg = document.createElement("div");
-      userMsg.className = "message user-message";
-      userMsg.textContent = message;
-      chatMessages.appendChild(userMsg);
-
-      input.value = "";
-      chatMessages.scrollTop = chatMessages.scrollHeight;
-
-      const botMsg = document.createElement("div");
-      botMsg.className = "message bot-message";
-      chatMessages.appendChild(botMsg);
-
-      getBotResponse(message, (botReply, done) => {
-        botMsg.textContent = botReply;
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      });
-    }
-  </script>
 </body>
 </html>
