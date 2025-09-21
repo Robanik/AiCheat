@@ -125,16 +125,17 @@
       // Бот отвечает через gptr.js
       getBotResponse(message, (botReply, done) => {
         if (done) {
-          // Финальный ответ
+          // Финальный ответ — новый элемент
+          const botMsg = document.createElement("div");
+          botMsg.className = "message bot-message";
           botMsg.textContent = botReply;
+          chatMessages.appendChild(botMsg);
         } else {
-          // Стадии "думаю..."
-          if (!window.botMsg || botMsg.done) {
-            window.botMsg = document.createElement("div");
-            window.botMsg.className = "message bot-message";
-            chatMessages.appendChild(window.botMsg);
-          }
-          window.botMsg.textContent = botReply;
+          // Стадии "думаю..." — отдельные элементы
+          const stageMsg = document.createElement("div");
+          stageMsg.className = "message bot-message";
+          stageMsg.textContent = botReply;
+          chatMessages.appendChild(stageMsg);
         }
         chatMessages.scrollTop = chatMessages.scrollHeight;
       });
