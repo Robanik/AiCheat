@@ -1,107 +1,133 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPTR 1.5 Flash Tiny GPT</title>
-<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.8.0/dist/tf.min.js"></script>
-<script src="https://cdn.jsdelivr.net/gh/soskek/tfjs-gpt2@latest/gpt2.min.js"></script>
-<style>
-body { font-family: Arial; background:#1a1a1a; color:#f0f0f0; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
-#chat-container { width:450px; height:650px; background:#2a2a2a; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 0 20px #000; }
-#messages { flex:1; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
-.message { background:#333; padding:8px 12px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; }
-.user { background:#007acc; align-self:flex-end; }
-.ai { background:#444; align-self:flex-start; }
-#input-container { display:flex; border-top:1px solid #555; }
-#input-container input { flex:1; padding:10px; border:none; outline:none; background:#1a1a1a; color:#fff; }
-#input-container button { padding:10px 15px; border:none; background:#007acc; color:#fff; cursor:pointer; }
-pre { background:#222; padding:8px; border-radius:6px; overflow-x:auto; }
-.copy-btn { position:absolute; top:5px; right:5px; background:#007acc; border:none; color:#fff; padding:2px 6px; font-size:12px; cursor:pointer; border-radius:4px; }
-</style>
+  <meta charset="UTF-8">
+  <title>Мой ИИ Чат</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .chat-container {
+      width: 400px;
+      height: 600px;
+      background: #222;
+      border-radius: 15px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+
+    .chat-header {
+      background: #0f3460;
+      padding: 15px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+      border-bottom: 2px solid #1a1a2e;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 15px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .message {
+      padding: 10px 15px;
+      border-radius: 12px;
+      max-width: 75%;
+      word-wrap: break-word;
+    }
+
+    .user-message {
+      background: #0f3460;
+      align-self: flex-end;
+    }
+
+    .bot-message {
+      background: #1a1a2e;
+      align-self: flex-start;
+    }
+
+    .chat-input {
+      display: flex;
+      border-top: 2px solid #1a1a2e;
+    }
+
+    .chat-input input {
+      flex: 1;
+      padding: 15px;
+      border: none;
+      outline: none;
+      background: #333;
+      color: #fff;
+      font-size: 14px;
+    }
+
+    .chat-input button {
+      background: #e94560;
+      border: none;
+      padding: 15px 20px;
+      cursor: pointer;
+      font-weight: bold;
+      color: #fff;
+      transition: 0.3s;
+    }
+
+    .chat-input button:hover {
+      background: #ff4c70;
+    }
+  </style>
 </head>
 <body>
-
-<div id="chat-container">
-    <div id="messages"></div>
-    <div id="input-container">
-        <input type="text" id="user-input" placeholder="Напиши команду..." autofocus />
-        <button onclick="sendMessage()">Отправить</button>
+  <div class="chat-container">
+    <div class="chat-header">🤖 Мой ИИ</div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input">
+      <input type="text" id="userInput" placeholder="Напиши сообщение...">
+      <button onclick="sendMessage()">Отправить</button>
     </div>
-</div>
+  </div>
 
-<script>
-const messagesContainer = document.getElementById('messages');
-const userInput = document.getElementById('user-input');
-let model;
+  <script>
+    function sendMessage() {
+      let input = document.getElementById("userInput");
+      let message = input.value.trim();
+      if (message === "") return;
 
-async function loadModel() {
-    messagesContainer.innerHTML += '<div class="message ai">Загрузка Tiny GPT...</div>';
-    model = await GPT2.load(); // загружаем Tiny GPT-2
-    messagesContainer.innerHTML += '<div class="message ai">GPT готов!</div>';
-}
+      let chatMessages = document.getElementById("chatMessages");
 
-function addMessage(text, sender) {
-    const msg = document.createElement('div');
-    msg.className = 'message ' + sender;
+      // сообщение от пользователя
+      let userMsg = document.createElement("div");
+      userMsg.className = "message user-message";
+      userMsg.textContent = message;
+      chatMessages.appendChild(userMsg);
 
-    if(text.includes('```')) {
-        let codeContent = text.replace(/```/g, '');
-        const pre = document.createElement('pre');
-        pre.textContent = codeContent;
+      input.value = "";
 
-        const btn = document.createElement('button');
-        btn.textContent = 'Скопировать';
-        btn.className = 'copy-btn';
-        btn.onclick = () => { navigator.clipboard.writeText(codeContent); };
+      // имитация ответа бота
+      setTimeout(() => {
+        let botMsg = document.createElement("div");
+        botMsg.className = "message bot-message";
+        botMsg.textContent = "🤖 Думаю над твоим сообщением...";
+        chatMessages.appendChild(botMsg);
+        chatMessages.scrollTop = chatMessages.scrollHeight;
+      }, 1000);
 
-        pre.appendChild(btn);
-        msg.appendChild(pre);
-    } else {
-        msg.textContent = text;
+      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
-
-    messagesContainer.appendChild(msg);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-async function simulateThinking() {
-    const steps = [
-        "«в мыслях...»",
-        "«анализирую команду»",
-        "«смотрю на промпт»",
-        "«обдумываю»",
-        "«готовлю ответ»"
-    ];
-    const aiMsg = document.createElement('div');
-    aiMsg.className = 'message ai';
-    messagesContainer.appendChild(aiMsg);
-
-    for(const step of steps) {
-        aiMsg.textContent = step;
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-        await new Promise(r => setTimeout(r, 2000)); // 2 сек на каждый шаг
-    }
-    return aiMsg;
-}
-
-async function sendMessage() {
-    const text = userInput.value.trim();
-    if(!text) return;
-    addMessage(text, 'user');
-    userInput.value = '';
-
-    const aiMsg = await simulateThinking();
-
-    // Генерация текста Tiny GPT
-    let response = await model.generate(text, {length: 100, temperature:0.7});
-    aiMsg.textContent = '';
-    addMessage(response, 'ai');
-}
-
-// Загружаем модель при старте
-loadModel();
-</script>
-
+  </script>
 </body>
 </html>
