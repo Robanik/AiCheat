@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <title>Мой ИИ Чат</title>
+  <title>Локальный ИИ Чат</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -93,7 +93,7 @@
 </head>
 <body>
   <div class="chat-container">
-    <div class="chat-header">🤖 Мой ИИ</div>
+    <div class="chat-header">🤖 Локальный ИИ</div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input">
       <input type="text" id="userInput" placeholder="Напиши сообщение...">
@@ -101,41 +101,43 @@
     </div>
   </div>
 
+  <!-- Подключаем базу знаний и логику -->
+  <script src="gptrd.js"></script>
+  <script src="gptr.js"></script>
+
   <script>
-    async function sendMessage() {
-      let input = document.getElementById("userInput");
-      let message = input.value.trim();
-      if (message === "") return;
+    function sendMessage() {
+      const input = document.getElementById("userInput");
+      const message = input.value.trim();
+      if (!message) return;
 
-      let chatMessages = document.getElementById("chatMessages");
+      const chatMessages = document.getElementById("chatMessages");
 
-      // сообщение от пользователя
-      let userMsg = document.createElement("div");
+      // Сообщение пользователя
+      const userMsg = document.createElement("div");
       userMsg.className = "message user-message";
       userMsg.textContent = message;
       chatMessages.appendChild(userMsg);
 
       input.value = "";
-
-      // показать "думаю..."
-      let botMsg = document.createElement("div");
-      botMsg.className = "message bot-message";
-      botMsg.textContent = "🤖 Думаю...";
-      chatMessages.appendChild(botMsg);
-
       chatMessages.scrollTop = chatMessages.scrollHeight;
 
-      // запрос на сервер Flask
-      let response = await fetch("http://127.0.0.1:5000/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message })
+      // Бот отвечает через gptr.js
+      getBotResponse(message, (botReply, done) => {
+        if (done) {
+          // Финальный ответ
+          botMsg.textContent = botReply;
+        } else {
+          // Стадии "думаю..."
+          if (!window.botMsg || botMsg.done) {
+            window.botMsg = document.createElement("div");
+            window.botMsg.className = "message bot-message";
+            chatMessages.appendChild(window.botMsg);
+          }
+          window.botMsg.textContent = botReply;
+        }
+        chatMessages.scrollTop = chatMessages.scrollHeight;
       });
-
-      let data = await response.json();
-      botMsg.textContent = data.response;
-
-      chatMessages.scrollTop = chatMessages.scrollHeight;
     }
   </script>
 </body>
