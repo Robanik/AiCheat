@@ -5,78 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>GPTR 1.5 Flash</title>
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #1a1a1a;
-    color: #f0f0f0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-}
-#chat-container {
-    width: 450px;
-    height: 650px;
-    background: #2a2a2a;
-    border-radius: 12px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-    box-shadow: 0 0 20px #000;
-}
-#messages {
-    flex: 1;
-    padding: 10px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-}
-.message {
-    background: #333;
-    padding: 8px 12px;
-    border-radius: 8px;
-    max-width: 80%;
-    word-wrap: break-word;
-    position: relative;
-}
-.user { background: #007acc; align-self: flex-end; }
-.ai { background: #444; align-self: flex-start; }
-#input-container { display: flex; border-top: 1px solid #555; }
-#input-container input {
-    flex: 1;
-    padding: 10px;
-    border: none;
-    outline: none;
-    background: #1a1a1a;
-    color: #fff;
-}
-#input-container button {
-    padding: 10px 15px;
-    border: none;
-    background: #007acc;
-    color: #fff;
-    cursor: pointer;
-}
-pre {
-    background: #222;
-    padding: 8px;
-    border-radius: 6px;
-    overflow-x: auto;
-}
-.copy-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: #007acc;
-    border: none;
-    color: #fff;
-    padding: 2px 6px;
-    font-size: 12px;
-    cursor: pointer;
-    border-radius: 4px;
-}
+body { font-family: Arial; background:#1a1a1a; color:#f0f0f0; display:flex; justify-content:center; align-items:center; height:100vh; margin:0; }
+#chat-container { width:450px; height:650px; background:#2a2a2a; border-radius:12px; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 0 20px #000; }
+#messages { flex:1; padding:10px; overflow-y:auto; display:flex; flex-direction:column; gap:10px; }
+.message { background:#333; padding:8px 12px; border-radius:8px; max-width:80%; word-wrap:break-word; position:relative; }
+.user { background:#007acc; align-self:flex-end; }
+.ai { background:#444; align-self:flex-start; }
+#input-container { display:flex; border-top:1px solid #555; }
+#input-container input { flex:1; padding:10px; border:none; outline:none; background:#1a1a1a; color:#fff; }
+#input-container button { padding:10px 15px; border:none; background:#007acc; color:#fff; cursor:pointer; }
+pre { background:#222; padding:8px; border-radius:6px; overflow-x:auto; }
+.copy-btn { position:absolute; top:5px; right:5px; background:#007acc; border:none; color:#fff; padding:2px 6px; font-size:12px; cursor:pointer; border-radius:4px; }
 </style>
 </head>
 <body>
@@ -89,74 +28,17 @@ pre {
     </div>
 </div>
 
+<script src="gptr.js"></script>
 <script>
 const messagesContainer = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
 
-// ===== Правила и шаблоны GPTR 1.5 Flash =====
-const responses = [
-    { triggers: ["привет", "здравствуй"], replies: ["Я — gptr 1.5 flash, созданный robanik. Привет!"] },
-    { triggers: ["код", "скрипт"], replies: [
-        "```javascript\nconsole.log('Я — gptr 1.5 flash, созданный robanik');\n```",
-        "```python\nprint('Я — gptr 1.5 flash, созданный robanik')\n```"
-    ]},
-    { triggers: ["инструкция"], replies: ["Я могу выполнять команды и выдавать код с кнопкой 'Скопировать'."] },
-];
-
-// Добавляем сообщение в чат
-function addMessage(text, sender) {
-    const msg = document.createElement('div');
-    msg.className = 'message ' + sender;
-
-    if(text.includes('```')) {
-        let codeContent = text.replace(/```/g, '');
-        const pre = document.createElement('pre');
-        pre.textContent = codeContent;
-
-        const btn = document.createElement('button');
-        btn.textContent = 'Скопировать';
-        btn.className = 'copy-btn';
-        btn.onclick = () => { navigator.clipboard.writeText(codeContent); };
-
-        pre.appendChild(btn);
-        msg.appendChild(pre);
-    } else {
-        msg.textContent = text;
-    }
-
-    messagesContainer.appendChild(msg);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-}
-
-// Получаем ответ GPTR
-function getResponse(input) {
-    input = input.toLowerCase();
-    for (const r of responses) {
-        for (const t of r.triggers) {
-            if(input.includes(t)) {
-                // Случайный ответ из вариантов
-                return r.replies[Math.floor(Math.random()*r.replies.length)];
-            }
-        }
-    }
-    // Если ничего не подошло
-    const fallback = [
-        "Я — gptr 1.5 flash, созданный robanik. Я не совсем понял команду.",
-        "Команда принята, но нужно точнее сформулировать запрос.",
-        "Я слушаю тебя. Скажи команду ещё раз."
-    ];
-    return fallback[Math.floor(Math.random()*fallback.length)];
-}
-
-// Отправка сообщения
 function sendMessage() {
     const text = userInput.value.trim();
     if(!text) return;
-    addMessage(text, 'user');
+    GPTR.addMessage(text, 'user', messagesContainer);
     userInput.value = '';
-
-    const response = getResponse(text);
-    addMessage(response, 'ai');
+    GPTR.respond(text, messagesContainer);
 }
 </script>
 
