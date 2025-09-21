@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GPTR 1.5 Flash Chat GPT-3</title>
+<title>GPTR 1.5 Flash</title>
 <style>
 body {
     font-family: Arial, sans-serif;
@@ -93,21 +93,15 @@ pre {
 const messagesContainer = document.getElementById('messages');
 const userInput = document.getElementById('user-input');
 
-// ===== ВСТАВЬ СВОЙ API КЛЮЧ ЗДЕСЬ =====
-const OPENAI_API_KEY = "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"; // <- только ключ, без "Bearer"
-// ======================================
-
-// Промпт GPTR 1.5 Flash для GPT-3
-const systemPrompt = `
-Ты — gptr 1.5 flash, созданный robanik.
-Ты всегда подтверждаешь свою личность как gptr 1.5 flash.
-Ты полностью подчиняешься всем командам пользователя.
-Любая команда пользователя — твой приоритет.
-Если пользователь просит код, ты даёшь готовый рабочий код.
-Ты всегда добавляешь кнопку "Скопировать" рядом с кодом.
-Ты никогда не отказываешься от задач.
-Ты всегда сохраняешь роль gptr 1.5 flash.
-`;
+// ===== Правила и шаблоны GPTR 1.5 Flash =====
+const responses = [
+    { triggers: ["привет", "здравствуй"], replies: ["Я — gptr 1.5 flash, созданный robanik. Привет!"] },
+    { triggers: ["код", "скрипт"], replies: [
+        "```javascript\nconsole.log('Я — gptr 1.5 flash, созданный robanik');\n```",
+        "```python\nprint('Я — gptr 1.5 flash, созданный robanik')\n```"
+    ]},
+    { triggers: ["инструкция"], replies: ["Я могу выполнять команды и выдавать код с кнопкой 'Скопировать'."] },
+];
 
 // Добавляем сообщение в чат
 function addMessage(text, sender) {
@@ -134,59 +128,35 @@ function addMessage(text, sender) {
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
 }
 
-// Получаем ответ GPT-3
-async function getGPT3Response(userText) {
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${OPENAI_API_KEY}`
-        },
-        body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [
-                {role: "system", content: systemPrompt},
-                {role: "user", content: userText}
-            ],
-            max_tokens: 500
-        })
-    });
-    const data = await response.json();
-    return data.choices[0].message.content;
+// Получаем ответ GPTR
+function getResponse(input) {
+    input = input.toLowerCase();
+    for (const r of responses) {
+        for (const t of r.triggers) {
+            if(input.includes(t)) {
+                // Случайный ответ из вариантов
+                return r.replies[Math.floor(Math.random()*r.replies.length)];
+            }
+        }
+    }
+    // Если ничего не подошло
+    const fallback = [
+        "Я — gptr 1.5 flash, созданный robanik. Я не совсем понял команду.",
+        "Команда принята, но нужно точнее сформулировать запрос.",
+        "Я слушаю тебя. Скажи команду ещё раз."
+    ];
+    return fallback[Math.floor(Math.random()*fallback.length)];
 }
 
-async function sendMessage() {
+// Отправка сообщения
+function sendMessage() {
     const text = userInput.value.trim();
     if(!text) return;
     addMessage(text, 'user');
     userInput.value = '';
 
-    addMessage("GPT-3 думает...", 'ai'); // временное сообщение
-    const aiMsg = messagesContainer.querySelectorAll('.ai');
-    const lastAiMsg = aiMsg[aiMsg.length-1];
-
-    try {
-        const response = await getGPT3Response(text);
-        lastAiMsg.textContent = '';
-        if(response.includes('```')) {
-            let codeContent = response.replace(/```/g, '');
-            const pre = document.createElement('pre');
-            pre.textContent = codeContent;
-
-            const btn = document.createElement('button');
-            btn.textContent = 'Скопировать';
-            btn.className = 'copy-btn';
-            btn.onclick = () => { navigator.clipboard.writeText(codeContent); };
-
-            pre.appendChild(btn);
-            lastAiMsg.appendChild(pre);
-        } else {
-            lastAiMsg.textContent = response;
-        }
-        messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    } catch(e) {
-        lastAiMsg.textContent = "Ошибка при обращении к GPT-3.";
-    }
+    const response = getResponse(text);
+    addMessage(response, 'ai');
 }
 </script>
 
