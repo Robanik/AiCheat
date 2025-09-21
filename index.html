@@ -102,7 +102,7 @@
   </div>
 
   <script>
-    function sendMessage() {
+    async function sendMessage() {
       let input = document.getElementById("userInput");
       let message = input.value.trim();
       if (message === "") return;
@@ -117,14 +117,23 @@
 
       input.value = "";
 
-      // имитация ответа бота
-      setTimeout(() => {
-        let botMsg = document.createElement("div");
-        botMsg.className = "message bot-message";
-        botMsg.textContent = "🤖 Думаю над твоим сообщением...";
-        chatMessages.appendChild(botMsg);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-      }, 1000);
+      // показать "думаю..."
+      let botMsg = document.createElement("div");
+      botMsg.className = "message bot-message";
+      botMsg.textContent = "🤖 Думаю...";
+      chatMessages.appendChild(botMsg);
+
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+
+      // запрос на сервер Flask
+      let response = await fetch("http://127.0.0.1:5000/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message })
+      });
+
+      let data = await response.json();
+      botMsg.textContent = data.response;
 
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
