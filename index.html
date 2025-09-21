@@ -1,69 +1,69 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ChatGPT на GitHub Pages</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background-color: #f5f5f5;
-        }
-        #chat-container {
-            width: 400px;
-            max-width: 90%;
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-        }
-        #chat-window {
-            height: 400px;
-            overflow-y: auto;
-            padding: 10px;
-            border-bottom: 1px solid #ccc;
-        }
-        .message {
-            margin: 5px 0;
-            padding: 8px 12px;
-            border-radius: 8px;
-            max-width: 80%;
-        }
-        .user {
-            background-color: #d1e7ff;
-            align-self: flex-end;
-        }
-        .bot {
-            background-color: #e2e2e2;
-            align-self: flex-start;
-        }
-        #input-container {
-            display: flex;
-        }
-        #user-input {
-            flex: 1;
-            padding: 10px;
-            border: none;
-            border-top: 1px solid #ccc;
-            border-radius: 0 0 0 10px;
-        }
-        #send-btn {
-            padding: 10px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            border-radius: 0 0 10px 0;
-        }
-        #send-btn:hover {
-            background-color: #0056b3;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ChatGPT на GitHub Pages</title>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+}
+#chat-container {
+    width: 400px;
+    max-width: 90%;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    display: flex;
+    flex-direction: column;
+}
+#chat-window {
+    height: 400px;
+    overflow-y: auto;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+.message {
+    margin: 5px 0;
+    padding: 8px 12px;
+    border-radius: 8px;
+    max-width: 80%;
+}
+.user {
+    background-color: #d1e7ff;
+    align-self: flex-end;
+}
+.bot {
+    background-color: #e2e2e2;
+    align-self: flex-start;
+}
+#input-container {
+    display: flex;
+}
+#user-input {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-top: 1px solid #ccc;
+    border-radius: 0 0 0 10px;
+}
+#send-btn {
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+    border-radius: 0 0 10px 0;
+}
+#send-btn:hover {
+    background-color: #0056b3;
+}
+</style>
 </head>
 <body>
 
@@ -80,7 +80,6 @@ const chatWindow = document.getElementById('chat-window');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Функция добавления сообщений в чат
 function addMessage(text, sender) {
     const messageDiv = document.createElement('div');
     messageDiv.className = 'message ' + sender;
@@ -89,7 +88,6 @@ function addMessage(text, sender) {
     chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// Обработка кнопки отправки
 sendBtn.addEventListener('click', () => {
     const text = userInput.value.trim();
     if (!text) return;
@@ -98,14 +96,12 @@ sendBtn.addEventListener('click', () => {
     getChatGPTResponse(text);
 });
 
-// Обработка Enter
 userInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') sendBtn.click();
 });
 
-// Функция запроса к ChatGPT через API
 async function getChatGPTResponse(message) {
-    addMessage('...', 'bot'); // временное сообщение
+    addMessage('...', 'bot'); // временный индикатор
     const botDiv = chatWindow.querySelector('.bot:last-child');
 
     try {
@@ -113,7 +109,7 @@ async function getChatGPTResponse(message) {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': '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'
+                'Authorization': 'Bearer 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'
             },
             body: JSON.stringify({
                 model: "gpt-3.5-turbo",
@@ -121,8 +117,14 @@ async function getChatGPTResponse(message) {
                 max_tokens: 150
             })
         });
+
         const data = await response.json();
-        botDiv.innerText = data.choices[0].message.content.trim();
+        if (data.choices && data.choices[0] && data.choices[0].message) {
+            botDiv.innerText = data.choices[0].message.content.trim();
+        } else {
+            botDiv.innerText = 'Ошибка: неправильный ответ API';
+            console.log(data);
+        }
     } catch (error) {
         botDiv.innerText = 'Ошибка: ' + error.message;
     }
